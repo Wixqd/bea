@@ -1,10 +1,40 @@
 import sys
 import msvcrt
 import os
+import sqlite3
+
 a = 0
 b = 0
 c = 1
 d = 0
+connection = sqlite3.connect("database.db")
+cursor = connection.cursor()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE
+)
+""")
+connection.commit()
+
+def login():
+    name = input("Как тебя зовут - ")      
+    cursor.execute(
+    "SELECT name FROM users WHERE name = ?",
+    (name,))
+    user = cursor.fetchone()
+    if user:
+        print(f"Привет, {name}")
+    else:
+        print("Имя внесено в базу")
+        cursor.execute(
+        "INSERT INTO users (name) VALUES (?)",
+        (name,)
+        )
+        connection.commit()
+    
+
+
 def conclear():
     os.system('cls' if os.name == 'nt' else 'clear')
 def enter_check():
@@ -67,11 +97,13 @@ def func():
         print('''
 До свидания!''')
         sys.exit(0)
+
     
     print("\nНажмите Enter, чтобы продолжить...")
     if enter_check():
         conclear()
     return
 while c != 0:
+    login()
     func()
 
